@@ -237,8 +237,8 @@ CRITICAL CONVERSATIONAL DISCIPLINE FOR VOICE-TO-VOICE CALLS:
       let dialogueHistory: { role: string; text: string }[] = [];
       let currentModelResponseText = "";
       
-      const session = await ai.live.connect({
-        model: "gemini-3.1-flash-live-preview",
+      // Configure live link properties
+      const liveOptions = {
         config: {
           responseModalities: [Modality.AUDIO],
           speechConfig: {
@@ -519,12 +519,39 @@ CRITICAL CONVERSATIONAL DISCIPLINE FOR VOICE-TO-VOICE CALLS:
               }
             }
           },
-          onclose: () => {
-            console.log("Gemini Live session closed");
-            clientWs.send(JSON.stringify({ type: "status", status: "session_closed" }));
+          onclose: (closeEvent?: any) => {
+            console.log(`[Gemini Live] Session closed. Event/Reason:`, closeEvent);
+            clientWs.send(JSON.stringify({ type: "status", status: "session_closed", reason: closeEvent }));
+          },
+          onerror: (err?: any) => {
+            console.error("[Gemini Live] Session error:", err);
           }
         }
-      });
+      };
+
+      let session: any = null;
+      let selectedModel = "";
+      const modelsToTry = ["gemini-2.0-flash-live-001", "gemini-2.0-flash-exp"];
+
+      for (const modelName of modelsToTry) {
+        try {
+          console.log(`[Gemini Live] Attempting connect using model: ${modelName}`);
+          session = await ai.live.connect({
+            model: modelName,
+            config: liveOptions.config,
+            callbacks: liveOptions.callbacks
+          });
+          selectedModel = modelName;
+          console.log(`[Gemini Live] Connection successfully established with model: ${selectedModel}`);
+          break;
+        } catch (err: any) {
+          console.error(`[Gemini Live] Failed connection with model ${modelName}:`, err?.message || err);
+        }
+      }
+
+      if (!session) {
+        throw new Error(`Failed to connect to any of the Gemini Live models: ${modelsToTry.join(", ")}`);
+      }
       
       clientWs.send(JSON.stringify({ type: "status", status: "connected" }));
       

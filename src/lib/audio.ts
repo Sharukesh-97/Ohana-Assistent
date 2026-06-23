@@ -129,12 +129,19 @@ export class MyraaAudioSession {
 
     try {
       // 1. Establish custom WebSocket server bridge
-      const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
-      this.ws = new WebSocket(`${protocol}//${window.location.host}/live?voice=${voiceName}`);
+      let wsUrl = "";
+      if (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1") {
+        wsUrl = `ws://localhost:3000/live?voice=${voiceName}`;
+      } else {
+        const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+        wsUrl = `${protocol}//${window.location.host}/live?voice=${voiceName}`;
+      }
+      console.log("[Myraa] Establishing WebSocket link to:", wsUrl);
+      this.ws = new WebSocket(wsUrl);
       this.ws.binaryType = "blob";
 
       this.ws.onopen = async () => {
-        console.log("[Myraa] Connected to server side WS bridge");
+        console.log("[Myraa] WebSocket opened successfully on:", wsUrl);
         try {
           // Guard against early user disconnect during connection setup
           if (!this.isActivated) return;
@@ -234,6 +241,7 @@ export class MyraaAudioSession {
       this.ws.onmessage = async (event) => {
         try {
           const data = JSON.parse(event.data);
+          console.log("[Myraa] WebSocket message received, type:", data.type || "unknown");
           
           // Root Error Handler message
           if (data.type === "error") {
@@ -309,13 +317,13 @@ export class MyraaAudioSession {
       };
 
       this.ws.onerror = (wsError) => {
-        console.error("WebSocket transport error:", wsError);
+        console.error("[Myraa] WebSocket encountered an error:", wsError);
         this.onError("Holographic network link lost. Please check connection.");
         this.disconnect();
       };
 
-      this.ws.onclose = () => {
-        console.log("WebSocket connection closed");
+      this.ws.onclose = (event) => {
+        console.log(`[Myraa] WebSocket closed. Code: ${event.code}, Reason: ${event.reason || "none"}`);
         this.disconnect();
       };
 
