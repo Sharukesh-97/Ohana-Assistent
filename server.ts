@@ -1,10 +1,13 @@
 import express from "express";
 import http from "http";
 import path from "path";
+import { fileURLToPath } from "url";
 import { WebSocketServer } from "ws";
 import { GoogleGenAI, Modality, Type, LiveServerMessage } from "@google/genai";
-import { createServer as createViteServer } from "vite";
 import dotenv from "dotenv";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 import { 
   loadMemories, 
   saveMemories, 
@@ -566,20 +569,23 @@ CRITICAL CONVERSATIONAL DISCIPLINE FOR VOICE-TO-VOICE CALLS:
   });
 
   // Serve custom static assets folder
-  app.use("/assets", express.static(path.join(process.cwd(), "assets")));
+  app.use("/assets", express.static(path.join(__dirname, "assets")));
 
   // Express Static assets / Vite Dev Middleware configuration
-  if (process.env.NODE_ENV !== "production") {
+  const isProduction = process.env.NODE_ENV === "production" || (process.env.NODE_ENV !== "development" && !!process.env.PORT);
+
+  if (!isProduction) {
+    const { createServer: createViteServer } = await import("vite");
     const vite = await createViteServer({
       server: { middlewareMode: true },
       appType: "spa",
     });
     app.use(vite.middlewares);
   } else {
-    const distPath = path.join(process.cwd(), 'dist');
+    const distPath = path.join(__dirname, "dist");
     app.use(express.static(distPath));
-    app.get('*', (req, res) => {
-      res.sendFile(path.join(distPath, 'index.html'));
+    app.get("*", (req, res) => {
+      res.sendFile(path.join(distPath, "index.html"));
     });
   }
 
