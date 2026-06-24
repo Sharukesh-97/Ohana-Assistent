@@ -436,7 +436,15 @@ export default function App() {
                 >
                   {textType === "model" && (
                     <h2 className="text-xl sm:text-2xl font-light text-white leading-relaxed tracking-wide font-display max-w-2xl drop-shadow-[0_2px_20px_rgba(0,0,0,0.9)]">
-                      {activeText}
+                      {activeText
+  .replace(/\*\*.*?\*\*/g, "")
+  .replace(/Initiating.*?[.!]/g, "")
+  .replace(/Following.*?[.!]/g, "")
+  .replace(/I am now.*?[.!]/g, "")
+  .replace(/user input is ignored.*?[.!]/gi, "")
+  .replace(/content is paramount.*?[.!]/gi, "")
+  .trim()
+}
                     </h2>
                   )}
 
