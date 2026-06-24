@@ -531,7 +531,7 @@ CRITICAL CONVERSATIONAL DISCIPLINE FOR VOICE-TO-VOICE CALLS:
 
       let session: any = null;
       let selectedModel = "";
-      const modelsToTry = ["gemini-3.1-flash-live-preview", "gemini-2.5-flash-native-audio-preview-12-2025"];
+      const modelsToTry = ["gemini-2.0-flash-live-001"];
 
       for (const modelName of modelsToTry) {
         try {
