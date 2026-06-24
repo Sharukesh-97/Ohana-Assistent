@@ -215,11 +215,7 @@ export class MyraaAudioSession {
             const base64 = base64ArrayBuffer(pcmBuffer);
             
             if (this.ws && this.ws.readyState === WebSocket.OPEN) {
-              if (!this.hasPlayedAnniversaryIntro) {
-                this.handleLocalVoiceActivity(channelData, base64);
-              } else {
-                this.ws.send(JSON.stringify({ audio: base64 }));
-              }
+              this.ws.send(JSON.stringify({ audio: base64 }));
             }
           };
 
@@ -227,9 +223,7 @@ export class MyraaAudioSession {
           this.setState("listening");
 
           // Start local VAD safe fallback timeout if intro hasn't played
-          if (!this.hasPlayedAnniversaryIntro) {
-            this.startLocalVadFallback();
-          }
+          
 
         } catch (audioError: any) {
           console.error("Audio Context or Microphone Initialization Failed:", audioError);
