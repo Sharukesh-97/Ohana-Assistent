@@ -405,67 +405,7 @@ export default function App() {
         {/* Space Spacer to avoid head area */}
         <div className="h-6 sm:h-20" />
 
-        {/* Cinematic dialogue layer overlay - Smooth, delicate text transitions with soft focus blur */}
-        <div id="cinematic-subtitles" className="w-full max-w-3xl flex flex-col items-center justify-center text-center px-4 sm:px-6 relative z-25 mt-auto mb-2 sm:mb-6 pointer-events-none min-h-[5.5rem] sm:min-h-[6rem]">
-          <AnimatePresence mode="wait">
-            {(() => {
-              const textType = modelCaption 
-                ? "model" 
-                : userCaption 
-                  ? "user" 
-                  : "status";
-
-              const activeText = modelCaption 
-                ? modelCaption 
-                : userCaption 
-                  ? userCaption 
-                  : state === "listening" 
-                    ? "I am listening. Speak freely..." 
-                    : state === "connecting" 
-                      ? "Materializing presence links..." 
-                      : "Connect memory core to awaken my voice.";
-
-              return (
-                <motion.div
-                  key={textType}
-                  initial={{ opacity: 0, y: 15, filter: "blur(6px)" }}
-                  animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-                  exit={{ opacity: 0, y: -15, filter: "blur(6px)" }}
-                  transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-                  className="flex flex-col items-center justify-center w-full"
-                >
-                  {textType === "model" && (
-                    <h2 className="text-xl sm:text-2xl font-light text-white leading-relaxed tracking-wide font-display max-w-2xl drop-shadow-[0_2px_20px_rgba(0,0,0,0.9)]">
-                      {activeText
-  .replace(/\*\*.*?\*\*/g, "")
-  .replace(/Initiating.*?[.!]/g, "")
-  .replace(/Following.*?[.!]/g, "")
-  .replace(/I am now.*?[.!]/g, "")
-  .replace(/user input is ignored.*?[.!]/gi, "")
-  .replace(/content is paramount.*?[.!]/gi, "")
-  .trim()
-}
-                    </h2>
-                  )}
-
-                  {textType === "user" && (
-                    <p className="text-cyan-300 font-mono text-sm sm:text-base tracking-wider flex items-center justify-center gap-2 drop-shadow-[0_1px_10px_rgba(0,0,0,0.85)] font-medium">
-                      <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" />
-                      <span>&ldquo;{activeText}&rdquo;</span>
-                    </p>
-                  )}
-
-                  {textType === "status" && (
-                    <span className="text-xs sm:text-sm uppercase tracking-[0.3em] font-medium text-white/30 font-sans tracking-widest drop-shadow-[0_1px_4px_rgba(0, 0, 0, 0.5)]">
-                      {activeText}
-                    </span>
-                  )}
-                </motion.div>
-              );
-            })()}
-          </AnimatePresence>
-        </div>
-
+      
         {/* Interactive suggestions prompt guide */}
         <AnimatePresence>
           {showGuide && (
